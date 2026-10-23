@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPS GENERATOR - Professional Geotag Photo Studio</title>
+    <!-- Modern Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #090d16;
+            --bg-card: rgba(17, 24, 39, 0.75);
+            --bg-card-border: rgba(255, 255, 255, 0.08);
+            --bg-input: #111827;
+            --input-border: #1f293d;
+            --input-focus: #06b6d4;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            background-image:
+                radial-gradient(circle at 15% 15%, rgba(6, 182, 212, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.12) 0%, transparent 40%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0 16px 40px 16px;
+        }
+
+        /* Top Navigation Header */
+        header {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--bg-card-border);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4);
+        }
+
+        .brand-text h1 {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 40%, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .badge-pro {
+            background: rgba(6, 182, 212, 0.15);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            color: var(--accent-cyan);
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-cyan);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: 0.5;
+                transform: scale(0.85);
+            }
+        }
+
+        /* App Container Layout */
+        .app-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 28px auto 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1.05fr;
+            gap: 28px;
+            align-items: start;
+        }
+
+        /* Glassmorphic Panels */
+        .panel {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 20px;
+            padding: 26px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--bg-card-border);
+        }
+
+        .panel-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .panel-title span {
+            font-size: 18px;
+        }
+
+        .panel-badge {
+            font-size: 11px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 8px;
+            border-radius: 6px;
+            color: var(--text-muted);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Form Inputs & Sections */
+        .form-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .field-action {
+            font-size: 11px;
+            color: var(--accent-cyan);
+            cursor: pointer;
+            text-decoration: none;
+            transition: color 0.2s;
+            font-weight: 600;
+        }
+
+        .field-action:hover {
+            color: #67e8f9;
+        }
+
+        /* Modern Drag & Drop Upload Zone */
+        .upload-dropzone {
+            border: 2px dashed rgba(6, 182, 212, 0.35);
+            background: rgba(6, 182, 212, 0.03);
+            border-radius: 14px;
+            padding: 22px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            position: relative;
+        }
+
+        .upload-dropzone:hover {
+            border-color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.07);
+            transform: translateY(-1px);
+        }
+
+        .upload-dropzone.has-file {
+            border-color: var(--accent-emerald);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .dropzone-icon {
+            font-size: 32px;
+            margin-bottom: 6px;
+        }
+
+        .dropzone-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .dropzone-hint {
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        .file-info-badge {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent-emerald);
+            background: rgba(16, 185, 129, 0.12);
+            padding: 5px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Two column input rows */
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        select,
+        textarea {
+            width: 100%;
+            background-color: var(--bg-input);
+            border: 1px solid var(--input-border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: var(--text-main);
+            font-size: 13.5px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--input-focus);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15);
+        }
+
+        /* Mono styling for numeric inputs */
+        input#time,
+        input#date,
+        input#land,
+        input#long,
+        select#ampm {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Custom Time + AM/PM selector */
+        .time-box {
+            display: flex;
+            gap: 8px;
+        }
+
+        select#ampm {
+            width: 90px;
+            font-weight: 700;
+            cursor: pointer;
+            background-color: #1e293b;
+            color: var(--accent-cyan);
+            border: 1px solid #334155;
+            text-align: center;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            line-height: 1.5;
+        }
+
+        /* Submit Button */
+        .btn-generate {
+            width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 50%, #8b5cf6 100%);
+            background-size: 200% auto;
+            color: white;
+            font-size: 15px;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(6, 182, 212, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            margin-top: 6px;
+        }
+
+        .btn-generate:hover {
+            background-position: right center;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.5);
+        }
+
+        .btn-generate:active {
+            transform: translateY(0);
+        }
+
+        /* Preview Panel Layout */
+        .preview-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Placeholder Empty State */
+        .empty-preview {
+            width: 100%;
+            min-height: 480px;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px;
+            color: var(--text-dim);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.6;
+        }
+
+        .empty-preview h3 {
+            font-size: 16px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .empty-preview p {
+            font-size: 12px;
+            max-width: 280px;
+            line-height: 1.5;
+        }
+
+        /* The Output Card Container */
+        #preview-wrapper {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* GPS Photo Preview Card (Strict aspect-ratio matching uploaded image) */
+        #inmain {
+            border: 2px solid #000;
+            position: relative;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: #000;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #mainimg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        /* GPS Overlay System */
+        #im {
+            position: absolute;
+            bottom: 8px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 8px;
+            box-sizing: border-box;
+            z-index: 5;
+        }
+
+        #map {
+            height: 26px;
+            background-color: rgba(0, 0, 0, 0.70);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 2px 8px;
+            gap: 6px;
+            border-radius: 4px;
+            align-self: flex-end;
+            margin-right: 4px;
+            margin-bottom: 5px;
+        }
+
+        #kunal {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #kimg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+
+        #map :last-child {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        #content {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            align-items: stretch;
+            box-sizing: border-box;
+        }
+
+        #gimg {
+            height: 80px;
+            width: 80px;
+            min-width: 80px;
+            background-image: url("https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/BlueMarble_ShadedRelief_Bathymetry/default//500m/2/1/2.jpeg");
+            background-position: center;
+            background-size: cover;
+            border-radius: 6px;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: flex-end;
+            padding: 5px;
+            box-sizing: border-box;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        #cont {
+            min-height: 80px;
+            flex: 1;
+            background-color: rgba(0, 0, 0, 0.70);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 6px 8px;
+            border-radius: 6px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        #cont .address {
+            font-size: 11px;
+            line-height: 14px;
+            margin-bottom: 3px;
+            word-break: break-word;
+        }
+
+        #cont .meta-info {
+            font-size: 10px;
+            line-height: 14px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Action Buttons Below Preview */
+        #action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .btn-download {
+            padding: 12px 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-png {
+            background: linear-gradient(135deg, #0284c7, #2563eb);
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+        }
+
+        .btn-png:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.5);
+        }
+
+        .btn-jpg {
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+        }
+
+        .btn-jpg:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(16, 185, 129, 0.5);
+        }
+
+        .btn-download:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #reload {
+            padding: 12px 18px;
+            background-color: #1e293b;
+            color: #cbd5e1;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #reload:hover {
+            background-color: #334155;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 900px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+
+            .panel {
+                padding: 20px;
+            }
+
+            .empty-preview {
+                min-height: 280px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 16px 4px;
+            }
+
+            .brand-text h1 {
+                font-size: 18px;
+            }
+
+            .row-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-download,
+            #reload {
+                padding: 10px 14px;
+                font-size: 12.5px;
+                flex: 1;
+                min-width: 100px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Header -->
+    <header>
+        <div class="brand">
+            <div class="brand-icon">🛰️</div>
+            <div class="brand-text">
+                <h1>GPS GENERATOR 2.0</h1>
+                <p>Professional Geotag Photo Studio</p>
+            </div>
+        </div>
+        <div class="badge-pro">
+            <div class="badge-dot"></div>
+            <span>Auto Native Res</span>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="app-container">
+        <!-- Settings Form Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <span>⚙️</span>
+                    <h3>Metadata Configuration</h3>
+                </div>
+                <div class="panel-badge">Step 1</div>
+            </div>
+
+            <div class="form-grid">
+                <!-- Image Upload Dropzone -->
+                <div class="field-group">
+                    <label>
+                        <span>Select Photo</span>
+                        <span class="field-action" onclick="document.getElementById('imgg').click()">Browse files</span>
+                    </label>
+                    <div class="upload-dropzone" id="dropzone" onclick="document.getElementById('imgg').click()">
+                        <div class="dropzone-icon">📷</div>
+                        <div class="dropzone-text" id="dropzone-label">Click or Drag & Drop Photo Here</div>
+                        <div class="dropzone-hint">Supports JPG, PNG, WebP • Auto-detects native dimensions</div>
+                        <div class="file-info-badge" id="file-info">
+                            <span id="file-name">photo.jpg</span> • <span id="file-res">1920 × 1080 px</span>
+                        </div>
+                    </div>
+                    <input type="file" id="imgg" accept="image/*">
+                </div>
+
+                <!-- Date & Time Row -->
+                <div class="row-2">
+                    <div class="field-group">
+                        <label>
+                            <span>Time</span>
+                            <span class="field-action" onclick="setCurrentDateTime()">⚡ Now</span>
+                        </label>
+                        <div class="time-box">
+                            <input type="time" id="time">
+                            <select id="ampm">
+                                <option value="AM">AM</option>
+                                <option value="PM" selected>PM</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label><span>Date</span></label>
+                        <input type="date" id="date">
+                    </div>
+                </div>
+
+                <!-- Latitude & Longitude Row -->
+                <div class="row-2">
+                    <div class="field-group">
+                        <label>
+                            <span>Latitude</span>
+                            <span class="field-action" onclick="getCurrentLocation()">📍 GPS</span>
+                        </label>
+                        <input type="text" value="21.856876°" id="land" placeholder="e.g. 21.856876°">
+                    </div>
+
+                    <div class="field-group">
+                        <label><span>Longitude</span></label>
+                        <input type="text" value="75.1599166°" id="long" placeholder="e.g. 75.1599166°">
+                    </div>
+                </div>
+
+                <!-- Address Input -->
+                <div class="field-group">
+                    <label><span>Geotag Address</span></label>
+                    <textarea id="address" rows="3"
+                        placeholder="Enter complete location address (e.g. Street, City, State, Country, Pin Code)">Khargone, Madhya Pradesh, India
+VH4X+MPW, Bardiya, Khaltaka, Khargone, Madhya Pradesh 451001, India</textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <button class="btn-generate" id="submit" onclick="func()">
+                    <span>✨ Generate GPS Photo</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Live Preview Panel -->
+        <div class="panel preview-panel">
+            <div class="panel-header" style="width: 100%;">
+                <div class="panel-title">
+                    <span>👁️</span>
+                    <h3>Live Output Preview</h3>
+                </div>
+                <div class="panel-badge" id="preview-badge">1:1 Native Scale</div>
+            </div>
+
+            <!-- Empty Placeholder (Before Generation) -->
+            <div class="empty-preview" id="empty-state">
+                <div class="empty-icon">🖼️</div>
+                <h3>Preview will appear here</h3>
+                <p>Upload a photo and click "Generate GPS Photo" to view your geotagged image in its exact aspect ratio.
+                </p>
+            </div>
+
+            <!-- Generated GPS Photo Card -->
+            <div id="preview-wrapper">
+                <div id="inmain">
+                    <img id="mainimg" src="" alt="GPS Photo" crossorigin="anonymous">
+                    <div id="im">
+                        <div id="map">
+                            <div style="border-radius: 2px;" id="kunal">
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSh8F4PtVO0jvyMJX2cqZTVLM6GYP0jmtlT4Q&s"
+                                    alt="" id="kimg" crossorigin="anonymous">
+                            </div>
+                            <div>GPS Map Camera</div>
+                        </div>
+                        <div id="content">
+                            <div id="gimg">google</div>
+                            <div id="cont">
+                                <div class="address">Khargone, Madhya Pradesh, India
+                                    VH4X+MPW, Bardiya, Khaltaka, Khargone, Madhya Pradesh 451001, India</div>
+                                <div class="meta-info">
+                                    Lat <span id="s3">21.856876°</span> Long <span id="s4">75.1599166°</span><br>
+                                    <span id="s1">06/12/24</span> <span id="s2">12:21 PM</span> GMT +05:30
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Download Buttons -->
+                <div id="action-buttons">
+                    <button id="download-png-btn" class="btn-download btn-png" onclick="downloadImage('png')">
+                        <span>📥</span> Download PNG
+                    </button>
+                    <button id="download-jpg-btn" class="btn-download btn-jpg" onclick="downloadImage('jpg')">
+                        <span>📥</span> Download JPG
+                    </button>
+                    <button onclick="location.reload()" id="reload">
+                        <span>🔄</span> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- HTML2Canvas Library -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script>
+        const fileInput = document.getElementById("imgg");
+        const dropzone = document.getElementById("dropzone");
+        const dropzoneLabel = document.getElementById("dropzone-label");
+        const fileInfo = document.getElementById("file-info");
+        const fileNameSpan = document.getElementById("file-name");
+        const fileResSpan = document.getElementById("file-res");
+        const timeInput = document.getElementById("time");
+        const ampmSelect = document.getElementById("ampm");
+        const dateInput = document.getElementById("date");
+
+        let origWidth = 460;
+        let origHeight = 670;
+
+        // Auto-fill Current Time & Date on page load
+        function setCurrentDateTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            let ampm = hours >= 12 ? "PM" : "AM";
+
+            ampmSelect.value = ampm;
+            timeInput.value = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+            dateInput.value = now.toISOString().split("T")[0];
+        }
+        setCurrentDateTime();
+
+        // Sync AM/PM when user interacts with time input
+        timeInput.addEventListener("input", () => {
+            if (timeInput.value) {
+                let [h] = timeInput.value.split(":");
+                let hours = parseInt(h);
+                ampmSelect.value = hours >= 12 ? "PM" : "AM";
+            }
+        });
+
+        // Quick GPS Location Helper
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        document.getElementById("land").value = pos.coords.latitude.toFixed(6) + "°";
+                        document.getElementById("long").value = pos.coords.longitude.toFixed(6) + "°";
+                    },
+                    (err) => {
+                        alert("Could not fetch location: " + err.message);
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        }
+
+        // Drag & Drop Handling for Upload Zone
+        dropzone.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            dropzone.style.borderColor = "var(--accent-cyan)";
+            dropzone.style.background = "rgba(6, 182, 212, 0.1)";
+        });
+
+        dropzone.addEventListener("dragleave", () => {
+            dropzone.style.borderColor = "";
+            dropzone.style.background = "";
+        });
+
+        dropzone.addEventListener("drop", (e) => {
+            e.preventDefault();
+            dropzone.style.borderColor = "";
+            dropzone.style.background = "";
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelected(fileInput.files[0]);
+            }
+        });
+
+        fileInput.addEventListener("change", () => {
+            if (fileInput.files && fileInput.files[0]) {
+                handleFileSelected(fileInput.files[0]);
+            }
+        });
+
+        function handleFileSelected(file) {
+            dropzone.classList.add("has-file");
+            dropzoneLabel.innerText = "Photo Ready to Generate";
+            fileNameSpan.innerText = file.name.length > 20 ? file.name.substring(0, 18) + "..." : file.name;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const temp = new Image();
+                temp.onload = () => {
+                    origWidth = temp.naturalWidth;
+                    origHeight = temp.naturalHeight;
+                    fileResSpan.innerText = `${origWidth} × ${origHeight} px`;
+                    fileInfo.style.display = "inline-flex";
+                };
+                temp.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Generate GPS Photo
+        const func = () => {
+            if (!fileInput.files || !fileInput.files[0]) {
+                alert("Please select or drop a valid photo first.");
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = (e) => {
+                const tempImg = new Image();
+                tempImg.onload = () => {
+                    origWidth = tempImg.naturalWidth;
+                    origHeight = tempImg.naturalHeight;
+
+                    // Compute responsive preview dimensions matching exact native aspect ratio
+                    const previewPanel = document.querySelector(".preview-panel");
+                    const availableWidth = Math.min(previewPanel.offsetWidth - 40, 480);
+                    const availableHeight = Math.min(window.innerHeight * 0.70, 620);
+                    const ratio = Math.min(availableWidth / origWidth, availableHeight / origHeight);
+                    const dispW = Math.round(origWidth * ratio);
+                    const dispH = Math.round(origHeight * ratio);
+
+                    const inmain = document.getElementById("inmain");
+                    inmain.style.width = dispW + "px";
+                    inmain.style.height = dispH + "px";
+                    inmain.style.minWidth = dispW + "px";
+                    inmain.style.minHeight = dispH + "px";
+                    inmain.style.maxWidth = dispW + "px";
+                    inmain.style.maxHeight = dispH + "px";
+
+                    const previewWrapper = document.getElementById("preview-wrapper");
+                    const emptyState = document.getElementById("empty-state");
+                    emptyState.style.display = "none";
+                    previewWrapper.style.display = "flex";
+
+                    document.getElementById("preview-badge").innerText = `${origWidth} × ${origHeight} px`;
+
+                    const oldimg = document.getElementById("mainimg");
+                    oldimg.src = e.target.result;
+
+                    // Scroll preview into view smoothly on mobile devices
+                    if (window.innerWidth <= 900) {
+                        previewWrapper.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                };
+                tempImg.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+
+            // Populate metadata
+            let newtime = document.getElementById("time").value;
+            let selectedAmPm = document.getElementById("ampm").value;
+            let newdate = document.getElementById("date").value;
+            let newland = document.getElementById("land").value;
+            let newlong = document.getElementById("long").value;
+            let address = document.querySelector("textarea").value;
+            let imgadd = document.querySelector(".address");
+
+            imgadd.innerHTML = (address || `Khargone, Madhya Pradesh, India
+VH4X+MPW, Bardiya, Khaltaka, Khargone, Madhya Pradesh 451001, India`).replace(/\n/g, "<br>");
+
+            let formattedDate = "";
+            if (newdate) {
+                let dateParts = newdate.split("-");
+                formattedDate = `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}`;
+            }
+
+            if (newtime) {
+                let [hours, minutes] = newtime.split(":");
+                hours = parseInt(hours);
+                hours = hours % 12 || 12;
+                newtime = `${hours}:${minutes} ${selectedAmPm}`;
+            }
+
+            if (formattedDate) document.getElementById("s1").innerText = formattedDate;
+            if (newtime) document.getElementById("s2").innerText = newtime;
+            if (newland) document.getElementById("s3").innerText = newland;
+            if (newlong) document.getElementById("s4").innerText = newlong;
+        };
+
+        // Dual Format Download Handler (PNG & JPG in Exact Native Resolution)
+        const downloadImage = (format) => {
+            const inmain = document.getElementById("inmain");
+            const pngBtn = document.getElementById("download-png-btn");
+            const jpgBtn = document.getElementById("download-jpg-btn");
+
+            pngBtn.disabled = true;
+            jpgBtn.disabled = true;
+            const activeBtn = format === 'png' ? pngBtn : jpgBtn;
+            const originalText = activeBtn.innerHTML;
+            activeBtn.innerHTML = "<span>⏳</span> Exporting...";
+
+            const dispW = inmain.offsetWidth;
+            const dispH = inmain.offsetHeight;
+            const scale = origWidth / dispW;
+
+            html2canvas(inmain, {
+                useCORS: true,
+                scale: scale,
+                width: dispW,
+                height: dispH,
+                scrollX: 0,
+                scrollY: 0,
+                backgroundColor: format === 'jpg' ? '#ffffff' : null,
+            }).then((canvas) => {
+                let finalCanvas = canvas;
+                if (canvas.width !== origWidth || canvas.height !== origHeight || format === 'jpg') {
+                    finalCanvas = document.createElement("canvas");
+                    finalCanvas.width = origWidth;
+                    finalCanvas.height = origHeight;
+                    const ctx = finalCanvas.getContext("2d");
+
+                    if (format === 'jpg') {
+                        ctx.fillStyle = "#ffffff";
+                        ctx.fillRect(0, 0, origWidth, origHeight);
+                    }
+
+                    ctx.drawImage(canvas, 0, 0, origWidth, origHeight);
+                }
+
+                const mimeType = format === 'png' ? "image/png" : "image/jpeg";
+                const extension = format === 'png' ? "png" : "jpg";
+                const quality = format === 'jpg' ? 0.95 : undefined;
+
+                const link = document.createElement("a");
+                link.download = `GPS_GENERATOR_${origWidth}x${origHeight}.${extension}`;
+                link.href = finalCanvas.toDataURL(mimeType, quality);
+                link.click();
+            }).catch((error) => {
+                console.error("Export generation failed:", error);
+                alert("Failed to export image. Please check console for details.");
+            }).finally(() => {
+                activeBtn.innerHTML = originalText;
+                pngBtn.disabled = false;
+                jpgBtn.disabled = false;
+            });
+        };
+    </script>
+</body>
+
+</html>
