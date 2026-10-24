@@ -576,15 +576,7 @@
             transition: all 0.2s ease;
         }
 
-        .btn-png {
-            background: linear-gradient(135deg, #0284c7, #2563eb);
-            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
-        }
 
-        .btn-png:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(2, 132, 199, 0.5);
-        }
 
         .btn-jpg {
             background: linear-gradient(135deg, #10b981, #059669);
@@ -600,6 +592,126 @@
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
+        }
+
+        /* PDF Action Button and Dropdown */
+        .pdf-btn-group {
+            position: relative;
+            display: inline-flex;
+            align-items: stretch;
+            border-radius: 10px;
+            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
+            transition: all 0.2s ease;
+        }
+
+        .pdf-btn-group:hover {
+            box-shadow: 0 6px 18px rgba(220, 38, 38, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-pdf {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: none;
+        }
+
+        .btn-pdf:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-pdf-toggle {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white;
+            border: none;
+            padding: 0 10px;
+            border-top-right-radius: 10px;
+            border-bottom-right-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
+        }
+
+        .btn-pdf-toggle:hover {
+            background: #991b1b;
+        }
+
+        .btn-pdf-toggle:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .pdf-dropdown-menu {
+            display: none;
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #111827;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            padding: 6px;
+            min-width: 210px;
+            z-index: 50;
+            backdrop-filter: blur(16px);
+        }
+
+        .pdf-dropdown-menu.show {
+            display: block;
+            animation: fadeInMenu 0.18s ease-out;
+        }
+
+        @keyframes fadeInMenu {
+            from {
+                opacity: 0;
+                transform: translate(-50%, 6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, 0);
+            }
+        }
+
+        .pdf-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s ease;
+            text-align: left;
+        }
+
+        .pdf-menu-item:hover {
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .pdf-menu-item .menu-icon {
+            font-size: 18px;
+        }
+
+        .pdf-menu-item .menu-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pdf-menu-item strong {
+            font-size: 12.5px;
+            color: #f8fafc;
+            font-weight: 600;
+        }
+
+        .pdf-menu-item small {
+            font-size: 10px;
+            color: #94a3b8;
         }
 
         #reload {
@@ -652,12 +764,22 @@
             }
 
             .btn-download,
+            .pdf-btn-group,
             #reload {
                 padding: 10px 14px;
                 font-size: 12.5px;
                 flex: 1;
                 min-width: 100px;
                 justify-content: center;
+            }
+
+            .btn-pdf {
+                padding: 10px 12px;
+                font-size: 12.5px;
+            }
+
+            .btn-pdf-toggle {
+                padding: 0 8px;
             }
         }
     </style>
@@ -700,13 +822,13 @@
                     </label>
                     <div class="upload-dropzone" id="dropzone" onclick="document.getElementById('imgg').click()">
                         <div class="dropzone-icon">📷</div>
-                        <div class="dropzone-text" id="dropzone-label">Click or Drag & Drop Photo Here</div>
-                        <div class="dropzone-hint">Supports JPG, PNG, WebP • Auto-detects native dimensions</div>
+                        <div class="dropzone-text" id="dropzone-label">Click or Drag & Drop Photo or PDF Here</div>
+                        <div class="dropzone-hint">Supports JPG, PNG, WebP, PDF • Auto-detects native dimensions</div>
                         <div class="file-info-badge" id="file-info">
                             <span id="file-name">photo.jpg</span> • <span id="file-res">1920 × 1080 px</span>
                         </div>
                     </div>
-                    <input type="file" id="imgg" accept="image/*">
+                    <input type="file" id="imgg" accept="image/*,application/pdf">
                 </div>
 
                 <!-- Date & Time Row -->
@@ -808,12 +930,35 @@ VH4X+MPW, Bardiya, Khaltaka, Khargone, Madhya Pradesh 451001, India</textarea>
 
                 <!-- Action Download Buttons -->
                 <div id="action-buttons">
-                    <button id="download-png-btn" class="btn-download btn-png" onclick="downloadImage('png')">
-                        <span>📥</span> Download PNG
-                    </button>
                     <button id="download-jpg-btn" class="btn-download btn-jpg" onclick="downloadImage('jpg')">
                         <span>📥</span> Download JPG
                     </button>
+                    <div class="pdf-btn-group">
+                        <button id="download-pdf-btn" class="btn-download btn-pdf"
+                            onclick="downloadImage('pdf', 'native')">
+                            <span>📄</span> Download PDF
+                        </button>
+                        <button id="pdf-dropdown-toggle" class="btn-pdf-toggle" onclick="togglePdfMenu(event)"
+                            title="PDF Format Options" aria-label="PDF options">
+                            <span>▾</span>
+                        </button>
+                        <div id="pdf-menu" class="pdf-dropdown-menu">
+                            <div class="pdf-menu-item" onclick="downloadImage('pdf', 'native')">
+                                <span class="menu-icon">🖼️</span>
+                                <div class="menu-text">
+                                    <strong>Exact Photo PDF</strong>
+                                    <small>1:1 Native Resolution Fit</small>
+                                </div>
+                            </div>
+                            <div class="pdf-menu-item" onclick="downloadImage('pdf', 'a4')">
+                                <span class="menu-icon">📑</span>
+                                <div class="menu-text">
+                                    <strong>A4 Document Sheet</strong>
+                                    <small>Print-ready Page Layout</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <button onclick="location.reload()" id="reload">
                         <span>🔄</span> Reset
                     </button>
@@ -822,9 +967,15 @@ VH4X+MPW, Bardiya, Khaltaka, Khargone, Madhya Pradesh 451001, India</textarea>
         </div>
     </div>
 
-    <!-- HTML2Canvas Library -->
+    <!-- HTML2Canvas & jsPDF & PDF.js Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
     <script>
+        if (window.pdfjsLib) {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+        }
+
         const fileInput = document.getElementById("imgg");
         const dropzone = document.getElementById("dropzone");
         const dropzoneLabel = document.getElementById("dropzone-label");
@@ -837,6 +988,7 @@ VH4X+MPW, Bardiya, Khaltaka, Khargone, Madhya Pradesh 451001, India</textarea>
 
         let origWidth = 460;
         let origHeight = 670;
+        let currentUploadedDataUrl = null;
 
         // Auto-fill Current Time & Date on page load
         function setCurrentDateTime() {
@@ -906,35 +1058,76 @@ VH4X+MPW, Bardiya, Khaltaka, Khargone, Madhya Pradesh 451001, India</textarea>
         });
 
         function handleFileSelected(file) {
-            dropzone.classList.add("has-file");
-            dropzoneLabel.innerText = "Photo Ready to Generate";
-            fileNameSpan.innerText = file.name.length > 20 ? file.name.substring(0, 18) + "..." : file.name;
+            if (!file) return;
 
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const temp = new Image();
-                temp.onload = () => {
-                    origWidth = temp.naturalWidth;
-                    origHeight = temp.naturalHeight;
-                    fileResSpan.innerText = `${origWidth} × ${origHeight} px`;
-                    fileInfo.style.display = "inline-flex";
+            const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+
+            if (isPdf) {
+                dropzoneLabel.innerText = "Processing PDF Document...";
+                const fileReader = new FileReader();
+                fileReader.onload = function (e) {
+                    const typedarray = new Uint8Array(e.target.result);
+                    if (typeof pdfjsLib === "undefined") {
+                        alert("PDF library is initializing, please try again in a moment.");
+                        return;
+                    }
+                    pdfjsLib.getDocument(typedarray).promise.then(function (pdf) {
+                        return pdf.getPage(1);
+                    }).then(function (page) {
+                        // Render at crisp 2x resolution
+                        const viewport = page.getViewport({ scale: 2.0 });
+                        const canvas = document.createElement("canvas");
+                        const ctx = canvas.getContext("2d");
+                        canvas.width = viewport.width;
+                        canvas.height = viewport.height;
+
+                        return page.render({ canvasContext: ctx, viewport: viewport }).promise.then(function () {
+                            currentUploadedDataUrl = canvas.toDataURL("image/jpeg", 0.95);
+                            origWidth = canvas.width;
+                            origHeight = canvas.height;
+
+                            dropzone.classList.add("has-file");
+                            dropzoneLabel.innerText = "PDF Page 1 Ready to Generate";
+                            fileNameSpan.innerText = file.name.length > 20 ? file.name.substring(0, 18) + "..." : file.name;
+                            fileResSpan.innerText = `${origWidth} × ${origHeight} px`;
+                            fileInfo.style.display = "inline-flex";
+                        });
+                    }).catch(function (err) {
+                        console.error("PDF processing failed:", err);
+                        alert("Could not load PDF page: " + (err.message || err));
+                        dropzoneLabel.innerText = "Click or Drag & Drop Photo or PDF Here";
+                    });
                 };
-                temp.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
+                fileReader.readAsArrayBuffer(file);
+            } else {
+                dropzone.classList.add("has-file");
+                dropzoneLabel.innerText = "Photo Ready to Generate";
+                fileNameSpan.innerText = file.name.length > 20 ? file.name.substring(0, 18) + "..." : file.name;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    currentUploadedDataUrl = e.target.result;
+                    const temp = new Image();
+                    temp.onload = () => {
+                        origWidth = temp.naturalWidth;
+                        origHeight = temp.naturalHeight;
+                        fileResSpan.innerText = `${origWidth} × ${origHeight} px`;
+                        fileInfo.style.display = "inline-flex";
+                    };
+                    temp.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
         }
 
         // Generate GPS Photo
         const func = () => {
-            if (!fileInput.files || !fileInput.files[0]) {
-                alert("Please select or drop a valid photo first.");
+            if (!currentUploadedDataUrl && (!fileInput.files || !fileInput.files[0])) {
+                alert("Please select or drop a valid photo or PDF file first.");
                 return;
             }
 
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-
-            reader.onload = (e) => {
+            const renderPreview = (dataUrl) => {
                 const tempImg = new Image();
                 tempImg.onload = () => {
                     origWidth = tempImg.naturalWidth;
@@ -964,16 +1157,27 @@ VH4X+MPW, Bardiya, Khaltaka, Khargone, Madhya Pradesh 451001, India</textarea>
                     document.getElementById("preview-badge").innerText = `${origWidth} × ${origHeight} px`;
 
                     const oldimg = document.getElementById("mainimg");
-                    oldimg.src = e.target.result;
+                    oldimg.src = dataUrl;
 
                     // Scroll preview into view smoothly on mobile devices
                     if (window.innerWidth <= 900) {
                         previewWrapper.scrollIntoView({ behavior: "smooth", block: "start" });
                     }
                 };
-                tempImg.src = e.target.result;
+                tempImg.src = dataUrl;
             };
-            reader.readAsDataURL(file);
+
+            if (currentUploadedDataUrl) {
+                renderPreview(currentUploadedDataUrl);
+            } else {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    currentUploadedDataUrl = e.target.result;
+                    renderPreview(currentUploadedDataUrl);
+                };
+                reader.readAsDataURL(file);
+            }
 
             // Populate metadata
             let newtime = document.getElementById("time").value;
@@ -1006,17 +1210,39 @@ VH4X+MPW, Bardiya, Khaltaka, Khargone, Madhya Pradesh 451001, India`).replace(/\
             if (newlong) document.getElementById("s4").innerText = newlong;
         };
 
-        // Dual Format Download Handler (PNG & JPG in Exact Native Resolution)
-        const downloadImage = (format) => {
-            const inmain = document.getElementById("inmain");
-            const pngBtn = document.getElementById("download-png-btn");
-            const jpgBtn = document.getElementById("download-jpg-btn");
+        // PDF Dropdown Options Toggle
+        function togglePdfMenu(event) {
+            event.stopPropagation();
+            const menu = document.getElementById("pdf-menu");
+            if (menu) menu.classList.toggle("show");
+        }
 
-            pngBtn.disabled = true;
-            jpgBtn.disabled = true;
-            const activeBtn = format === 'png' ? pngBtn : jpgBtn;
-            const originalText = activeBtn.innerHTML;
-            activeBtn.innerHTML = "<span>⏳</span> Exporting...";
+        function closePdfMenu() {
+            const menu = document.getElementById("pdf-menu");
+            if (menu) menu.classList.remove("show");
+        }
+
+        document.addEventListener("click", () => {
+            closePdfMenu();
+        });
+
+        // Multi-Format Export Handler (JPG, PDF Exact Native & A4)
+        const downloadImage = (format, subType = 'native') => {
+            const inmain = document.getElementById("inmain");
+            const jpgBtn = document.getElementById("download-jpg-btn");
+            const pdfBtn = document.getElementById("download-pdf-btn");
+            const pdfToggle = document.getElementById("pdf-dropdown-toggle");
+
+            closePdfMenu();
+
+            if (jpgBtn) jpgBtn.disabled = true;
+            if (pdfBtn) pdfBtn.disabled = true;
+            if (pdfToggle) pdfToggle.disabled = true;
+
+            const activeBtn = format === 'pdf' ? pdfBtn : jpgBtn;
+
+            const originalText = activeBtn ? activeBtn.innerHTML : "";
+            if (activeBtn) activeBtn.innerHTML = "<span>⏳</span> Exporting...";
 
             const dispW = inmain.offsetWidth;
             const dispH = inmain.offsetHeight;
@@ -1029,16 +1255,16 @@ VH4X+MPW, Bardiya, Khaltaka, Khargone, Madhya Pradesh 451001, India`).replace(/\
                 height: dispH,
                 scrollX: 0,
                 scrollY: 0,
-                backgroundColor: format === 'jpg' ? '#ffffff' : null,
+                backgroundColor: (format === 'jpg' || format === 'pdf') ? '#ffffff' : null,
             }).then((canvas) => {
                 let finalCanvas = canvas;
-                if (canvas.width !== origWidth || canvas.height !== origHeight || format === 'jpg') {
+                if (canvas.width !== origWidth || canvas.height !== origHeight || format === 'jpg' || format === 'pdf') {
                     finalCanvas = document.createElement("canvas");
                     finalCanvas.width = origWidth;
                     finalCanvas.height = origHeight;
                     const ctx = finalCanvas.getContext("2d");
 
-                    if (format === 'jpg') {
+                    if (format === 'jpg' || format === 'pdf') {
                         ctx.fillStyle = "#ffffff";
                         ctx.fillRect(0, 0, origWidth, origHeight);
                     }
@@ -1046,21 +1272,70 @@ VH4X+MPW, Bardiya, Khaltaka, Khargone, Madhya Pradesh 451001, India`).replace(/\
                     ctx.drawImage(canvas, 0, 0, origWidth, origHeight);
                 }
 
-                const mimeType = format === 'png' ? "image/png" : "image/jpeg";
-                const extension = format === 'png' ? "png" : "jpg";
-                const quality = format === 'jpg' ? 0.95 : undefined;
+                if (format === 'pdf') {
+                    if (typeof window.jspdf === "undefined" || !window.jspdf.jsPDF) {
+                        alert("PDF library is loading. Please verify internet connection.");
+                        return;
+                    }
+                    const { jsPDF } = window.jspdf;
+                    const orientation = origWidth >= origHeight ? 'landscape' : 'portrait';
 
-                const link = document.createElement("a");
-                link.download = `GPS_GENERATOR_${origWidth}x${origHeight}.${extension}`;
-                link.href = finalCanvas.toDataURL(mimeType, quality);
-                link.click();
+                    if (subType === 'a4') {
+                        // Standard A4 Document Layout (Print Ready)
+                        const doc = new jsPDF({
+                            orientation: orientation,
+                            unit: 'pt',
+                            format: 'a4',
+                            compress: true
+                        });
+
+                        const pageWidth = doc.internal.pageSize.getWidth();
+                        const pageHeight = doc.internal.pageSize.getHeight();
+                        const margin = 28;
+                        const maxWidth = pageWidth - (margin * 2);
+                        const maxHeight = pageHeight - (margin * 2);
+                        const ratio = Math.min(maxWidth / origWidth, maxHeight / origHeight);
+                        const renderW = Math.round(origWidth * ratio);
+                        const renderH = Math.round(origHeight * ratio);
+                        const posX = Math.round((pageWidth - renderW) / 2);
+                        const posY = Math.round((pageHeight - renderH) / 2);
+
+                        const imgData = finalCanvas.toDataURL("image/jpeg", 0.95);
+                        doc.addImage(imgData, 'JPEG', posX, posY, renderW, renderH, undefined, 'FAST');
+                        doc.save(`GPS_GENERATOR_A4_${origWidth}x${origHeight}.pdf`);
+                    } else {
+                        // Exact 1:1 Native Resolution Photo PDF
+                        const pdfWidth = origWidth * 0.75; // 96 DPI to 72 PT standard
+                        const pdfHeight = origHeight * 0.75;
+                        const doc = new jsPDF({
+                            orientation: orientation,
+                            unit: 'pt',
+                            format: [pdfWidth, pdfHeight],
+                            compress: true
+                        });
+
+                        const imgData = finalCanvas.toDataURL("image/jpeg", 0.95);
+                        doc.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+                        doc.save(`GPS_GENERATOR_${origWidth}x${origHeight}.pdf`);
+                    }
+                } else {
+                    const mimeType = format === 'png' ? "image/png" : "image/jpeg";
+                    const extension = format === 'png' ? "png" : "jpg";
+                    const quality = format === 'jpg' ? 0.95 : undefined;
+
+                    const link = document.createElement("a");
+                    link.download = `GPS_GENERATOR_${origWidth}x${origHeight}.${extension}`;
+                    link.href = finalCanvas.toDataURL(mimeType, quality);
+                    link.click();
+                }
             }).catch((error) => {
                 console.error("Export generation failed:", error);
-                alert("Failed to export image. Please check console for details.");
+                alert("Failed to export: " + (error.message || "Please check console for details."));
             }).finally(() => {
-                activeBtn.innerHTML = originalText;
-                pngBtn.disabled = false;
-                jpgBtn.disabled = false;
+                if (activeBtn) activeBtn.innerHTML = originalText;
+                if (jpgBtn) jpgBtn.disabled = false;
+                if (pdfBtn) pdfBtn.disabled = false;
+                if (pdfToggle) pdfToggle.disabled = false;
             });
         };
     </script>
