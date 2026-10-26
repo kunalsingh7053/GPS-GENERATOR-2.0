@@ -60,6 +60,8 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--bg-card-border);
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
         .brand {
@@ -129,6 +131,104 @@
                 opacity: 0.5;
                 transform: scale(0.85);
             }
+        }
+
+        /* Mode Switcher Navigation */
+        .nav-tabs {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(17, 24, 39, 0.9);
+            padding: 5px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+        }
+
+        .nav-tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.22), rgba(139, 92, 246, 0.22));
+            border: 1px solid rgba(6, 182, 212, 0.45);
+            color: #38bdf8;
+            box-shadow: 0 2px 14px rgba(6, 182, 212, 0.25);
+        }
+
+        .tab-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            background: linear-gradient(135deg, #06b6d4, #10b981);
+            color: #ffffff;
+            border-radius: 999px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        /* Batch Promo Banner */
+        .batch-banner {
+            width: 100%;
+            max-width: 1200px;
+            margin: 20px auto 0 auto;
+            background: linear-gradient(90deg, rgba(6, 182, 212, 0.08), rgba(139, 92, 246, 0.08));
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 14px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .batch-banner-text {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13.5px;
+            color: var(--text-muted);
+        }
+
+        .batch-banner-text strong {
+            color: var(--text-main);
+        }
+
+        .btn-switch-batch {
+            font-size: 12.5px;
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: rgba(6, 182, 212, 0.12);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-switch-batch:hover {
+            background: rgba(6, 182, 212, 0.25);
+            color: #67e8f9;
+            transform: translateY(-1px);
         }
 
         /* App Container Layout */
@@ -735,51 +835,174 @@
             transform: translateY(-2px);
         }
 
-        /* Responsive Breakpoints */
-        @media (max-width: 900px) {
+        /* Comprehensive Responsive Design System */
+        @media (max-width: 1024px) {
             .app-container {
-                grid-template-columns: 1fr;
-            }
-
-            .panel {
-                padding: 20px;
-            }
-
-            .empty-preview {
-                min-height: 280px;
+                gap: 20px;
             }
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 900px) {
+            body {
+                padding: 0 12px 32px 12px;
+            }
+
+            .app-container {
+                grid-template-columns: 1fr;
+                margin-top: 18px;
+                gap: 20px;
+            }
+
+            .panel {
+                padding: 20px 18px;
+                border-radius: 18px;
+            }
+
+            .empty-preview {
+                min-height: 240px;
+                padding: 24px 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
             header {
                 padding: 16px 4px;
+                gap: 12px;
+            }
+
+            .brand {
+                flex: 1;
+            }
+
+            .brand-icon {
+                width: 38px;
+                height: 38px;
+                font-size: 19px;
             }
 
             .brand-text h1 {
-                font-size: 18px;
+                font-size: 19px;
             }
 
+            .brand-text p {
+                font-size: 11px;
+            }
+
+            .nav-tabs {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .nav-tab {
+                flex: 1;
+                justify-content: center;
+                padding: 8px 12px;
+                font-size: 12.5px;
+            }
+
+            .badge-pro {
+                order: 2;
+                padding: 4px 8px;
+                font-size: 10.5px;
+            }
+
+            .batch-banner {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+                padding: 14px 16px;
+            }
+
+            .btn-switch-batch {
+                width: 100%;
+                justify-content: center;
+                text-align: center;
+                padding: 9px 16px;
+            }
+        }
+
+        @media (max-width: 640px) {
             .row-2 {
                 grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .panel {
+                padding: 16px 14px;
+                border-radius: 16px;
+            }
+
+            .panel-header {
+                margin-bottom: 16px;
+                padding-bottom: 10px;
+            }
+
+            .panel-title h3 {
+                font-size: 15px;
+            }
+
+            .upload-dropzone {
+                padding: 18px 12px;
+            }
+
+            .dropzone-icon {
+                font-size: 28px;
+            }
+
+            .dropzone-text {
+                font-size: 13.5px;
+            }
+
+            #action-buttons {
+                flex-direction: column;
+                width: 100%;
+                gap: 8px;
             }
 
             .btn-download,
             .pdf-btn-group,
             #reload {
-                padding: 10px 14px;
-                font-size: 12.5px;
-                flex: 1;
-                min-width: 100px;
+                width: 100%;
+                min-width: 100%;
                 justify-content: center;
             }
 
-            .btn-pdf {
-                padding: 10px 12px;
-                font-size: 12.5px;
+            .pdf-btn-group {
+                display: flex;
+                width: 100%;
             }
 
-            .btn-pdf-toggle {
-                padding: 0 8px;
+            .btn-pdf {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .pdf-dropdown-menu {
+                left: 0;
+                right: 0;
+                transform: none;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 380px) {
+            body {
+                padding: 0 8px 24px 8px;
+            }
+
+            .brand-text h1 {
+                font-size: 16px;
+            }
+
+            .nav-tab {
+                font-size: 11.5px;
+                padding: 6px 8px;
+                gap: 4px;
+            }
+
+            .tab-badge {
+                display: none;
             }
         }
     </style>
@@ -795,11 +1018,36 @@
                 <p>Professional Geotag Photo Studio</p>
             </div>
         </div>
+
+        <!-- Navigation Switcher -->
+        <nav class="nav-tabs">
+            <a href="index.html" class="nav-tab active">
+                <span>📷</span>
+                <span>Single Photo</span>
+            </a>
+            <a href="batch.html" class="nav-tab">
+                <span>⚡</span>
+                <span>Batch Mode</span>
+                <span class="tab-badge">Multi</span>
+            </a>
+        </nav>
+
         <div class="badge-pro">
             <div class="badge-dot"></div>
             <span>Auto Native Res</span>
         </div>
     </header>
+
+    <!-- Batch Mode Banner -->
+    <div class="batch-banner">
+        <div class="batch-banner-text">
+            <span style="font-size: 18px;">⚡</span>
+            <div><strong>Need to geotag multiple photos?</strong> Process dozens of photos at once with customizable coordinates & 1-click ZIP export in Batch Mode.</div>
+        </div>
+        <a href="batch.html" class="btn-switch-batch">
+            <span>Open Batch Studio →</span>
+        </a>
+    </div>
 
     <!-- Main Workspace -->
     <div class="app-container">
@@ -1120,6 +1368,57 @@ VH4X+MPW, Bardiya, Khaltaka, Khargone, Madhya Pradesh 451001, India</textarea>
             }
         }
 
+        function applyResponsivePreviewSize() {
+            if (!origWidth || !origHeight) return;
+            const inmain = document.getElementById("inmain");
+            const previewPanel = document.querySelector(".preview-panel");
+            if (!inmain || !previewPanel) return;
+
+            const panelPadding = window.innerWidth <= 640 ? 28 : 52;
+            const maxAllowedWidth = Math.min(previewPanel.clientWidth - panelPadding, 500);
+            const maxAllowedHeight = Math.min(window.innerHeight * 0.65, 580);
+
+            const ratio = Math.min(maxAllowedWidth / origWidth, maxAllowedHeight / origHeight);
+            const dispW = Math.max(Math.round(origWidth * ratio), 200);
+            const dispH = Math.round(origHeight * (dispW / origWidth));
+
+            inmain.style.width = dispW + "px";
+            inmain.style.height = dispH + "px";
+            inmain.style.maxWidth = "100%";
+            inmain.style.minWidth = "unset";
+            inmain.style.minHeight = "unset";
+            inmain.style.maxHeight = "unset";
+
+            // Fluid overlay adjustments for mobile/narrow screens
+            const gimg = document.getElementById("gimg");
+            const cont = document.getElementById("cont");
+            if (gimg && cont) {
+                const addr = cont.querySelector(".address");
+                const meta = cont.querySelector(".meta-info");
+                if (dispW < 340) {
+                    gimg.style.width = "60px";
+                    gimg.style.height = "60px";
+                    gimg.style.minWidth = "60px";
+                    cont.style.minHeight = "60px";
+                    cont.style.padding = "4px 6px";
+                    if (addr) { addr.style.fontSize = "9px"; addr.style.lineHeight = "12px"; }
+                    if (meta) { meta.style.fontSize = "8px"; meta.style.lineHeight = "11px"; }
+                } else {
+                    gimg.style.width = "80px";
+                    gimg.style.height = "80px";
+                    gimg.style.minWidth = "80px";
+                    cont.style.minHeight = "80px";
+                    cont.style.padding = "6px 8px";
+                    if (addr) { addr.style.fontSize = "11px"; addr.style.lineHeight = "14px"; }
+                    if (meta) { meta.style.fontSize = "10px"; meta.style.lineHeight = "14px"; }
+                }
+            }
+        }
+
+        window.addEventListener("resize", () => {
+            applyResponsivePreviewSize();
+        });
+
         // Generate GPS Photo
         const func = () => {
             if (!currentUploadedDataUrl && (!fileInput.files || !fileInput.files[0])) {
@@ -1133,21 +1432,7 @@ VH4X+MPW, Bardiya, Khaltaka, Khargone, Madhya Pradesh 451001, India</textarea>
                     origWidth = tempImg.naturalWidth;
                     origHeight = tempImg.naturalHeight;
 
-                    // Compute responsive preview dimensions matching exact native aspect ratio
-                    const previewPanel = document.querySelector(".preview-panel");
-                    const availableWidth = Math.min(previewPanel.offsetWidth - 40, 480);
-                    const availableHeight = Math.min(window.innerHeight * 0.70, 620);
-                    const ratio = Math.min(availableWidth / origWidth, availableHeight / origHeight);
-                    const dispW = Math.round(origWidth * ratio);
-                    const dispH = Math.round(origHeight * ratio);
-
-                    const inmain = document.getElementById("inmain");
-                    inmain.style.width = dispW + "px";
-                    inmain.style.height = dispH + "px";
-                    inmain.style.minWidth = dispW + "px";
-                    inmain.style.minHeight = dispH + "px";
-                    inmain.style.maxWidth = dispW + "px";
-                    inmain.style.maxHeight = dispH + "px";
+                    applyResponsivePreviewSize();
 
                     const previewWrapper = document.getElementById("preview-wrapper");
                     const emptyState = document.getElementById("empty-state");
@@ -1336,6 +1621,7 @@ VH4X+MPW, Bardiya, Khaltaka, Khargone, Madhya Pradesh 451001, India`).replace(/\
                 if (jpgBtn) jpgBtn.disabled = false;
                 if (pdfBtn) pdfBtn.disabled = false;
                 if (pdfToggle) pdfToggle.disabled = false;
+                applyResponsivePreviewSize();
             });
         };
     </script>

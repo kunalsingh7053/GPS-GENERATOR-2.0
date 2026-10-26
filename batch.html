@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch GPS Generator - Multi-Photo Geotag Studio</title>
+    <!-- Modern Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #090d16;
+            --bg-card: rgba(17, 24, 39, 0.78);
+            --bg-card-border: rgba(255, 255, 255, 0.08);
+            --bg-card-hover: rgba(26, 36, 56, 0.85);
+            --bg-input: #111827;
+            --input-border: #1f293d;
+            --input-focus: #06b6d4;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-amber: #f59e0b;
+            --accent-rose: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            background-image:
+                radial-gradient(circle at 15% 15%, rgba(6, 182, 212, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.12) 0%, transparent 40%),
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0 16px 40px 16px;
+        }
+
+        /* Top Header */
+        header {
+            width: 100%;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 24px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--bg-card-border);
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.4);
+        }
+
+        .brand-text h1 {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 40%, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-text p {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Nav Tabs Switcher */
+        .nav-tabs {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(17, 24, 39, 0.9);
+            padding: 5px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+        }
+
+        .nav-tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 9px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.22), rgba(139, 92, 246, 0.22));
+            border: 1px solid rgba(6, 182, 212, 0.45);
+            color: #38bdf8;
+            box-shadow: 0 2px 14px rgba(6, 182, 212, 0.25);
+        }
+
+        .tab-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            background: linear-gradient(135deg, #06b6d4, #10b981);
+            color: #ffffff;
+            border-radius: 999px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .badge-pro {
+            background: rgba(139, 92, 246, 0.15);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            color: #c084fc;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #c084fc;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #c084fc;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.85); }
+        }
+
+        /* App Container Layout */
+        .app-container {
+            width: 100%;
+            max-width: 1280px;
+            margin: 28px auto 0 auto;
+            display: grid;
+            grid-template-columns: 460px 1fr;
+            gap: 28px;
+            align-items: start;
+        }
+
+        /* Glassmorphic Panel */
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 20px;
+            padding: 24px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .panel-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-title h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .panel-badge {
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-muted);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Form Grid */
+        .form-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .field-action {
+            color: var(--accent-cyan);
+            cursor: pointer;
+            font-size: 11.5px;
+            font-weight: 700;
+            transition: color 0.2s;
+        }
+
+        .field-action:hover {
+            color: #38bdf8;
+            text-decoration: underline;
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="time"],
+        select,
+        textarea {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--input-border);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: var(--text-main);
+            font-size: 13.5px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="time"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--input-focus);
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.2);
+            background: #131c31;
+        }
+
+        .time-box {
+            display: flex;
+            gap: 8px;
+        }
+
+        .time-box input {
+            flex: 1;
+        }
+
+        .time-box select {
+            width: 82px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 72px;
+            line-height: 1.4;
+            font-family: inherit;
+        }
+
+        /* Upload Dropzone */
+        .upload-dropzone {
+            border: 2px dashed rgba(6, 182, 212, 0.35);
+            background: rgba(6, 182, 212, 0.03);
+            border-radius: 14px;
+            padding: 24px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .upload-dropzone:hover,
+        .upload-dropzone.dragover {
+            border-color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .dropzone-icon {
+            font-size: 32px;
+            margin-bottom: 2px;
+        }
+
+        .dropzone-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .dropzone-hint {
+            font-size: 11.5px;
+            color: var(--text-muted);
+        }
+
+        /* Upload Queue List */
+        .queue-wrapper {
+            margin-top: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .queue-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            padding: 0 4px;
+        }
+
+        .queue-count {
+            color: var(--accent-cyan);
+        }
+
+        .btn-text {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .btn-text:hover {
+            color: var(--accent-rose);
+        }
+
+        .queue-list {
+            max-height: 220px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding-right: 4px;
+        }
+
+        .queue-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .queue-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+        }
+
+        .queue-item {
+            background: rgba(17, 24, 39, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 9px;
+            padding: 8px 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .queue-item:hover {
+            border-color: rgba(6, 182, 212, 0.3);
+            background: rgba(26, 36, 56, 0.9);
+        }
+
+        .queue-thumb {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            object-fit: cover;
+            background: #000;
+            flex-shrink: 0;
+        }
+
+        .queue-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .queue-name {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .queue-meta {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            display: flex;
+            gap: 8px;
+            margin-top: 1px;
+        }
+
+        .queue-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-icon-small {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+            border-radius: 6px;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+        }
+
+        .btn-icon-small:hover {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--accent-rose);
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-edit-item {
+            background: rgba(6, 182, 212, 0.12);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(6, 182, 212, 0.25);
+            font-size: 10.5px;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-edit-item:hover {
+            background: rgba(6, 182, 212, 0.25);
+            color: #67e8f9;
+        }
+
+        /* Item Custom Edit Modal / Popover */
+        .item-edit-box {
+            display: none;
+            background: #0d1527;
+            border: 1px solid rgba(6, 182, 212, 0.35);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-top: 6px;
+            gap: 10px;
+            flex-direction: column;
+            width: 100%;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .item-edit-box.active {
+            display: flex;
+        }
+
+        .item-edit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .item-edit-tip {
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .item-edit-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .edit-field {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .edit-field label {
+            font-size: 10.5px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .item-edit-grid input,
+        .item-edit-grid select {
+            background: #111827;
+            border: 1px solid var(--input-border);
+            color: var(--text-main);
+            border-radius: 6px;
+            padding: 7px 9px;
+            font-size: 11.5px;
+            outline: none;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+
+        .item-edit-grid input:focus,
+        .item-edit-grid select:focus {
+            border-color: var(--accent-cyan);
+            background: #151f33;
+        }
+
+        .item-edit-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-top: 4px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        /* Generate Primary Button */
+        .btn-generate {
+            width: 100%;
+            background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            padding: 14px 20px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 20px rgba(6, 182, 212, 0.35);
+            margin-top: 6px;
+        }
+
+        .btn-generate:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 26px rgba(6, 182, 212, 0.5);
+            background: linear-gradient(135deg, #0891b2, #7c3aed);
+        }
+
+        .btn-generate:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Right Panel: Output Gallery */
+        .gallery-panel {
+            min-height: 580px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Empty State */
+        .empty-gallery {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 48px 24px;
+            background: rgba(17, 24, 39, 0.4);
+            border: 2px dashed rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 14px;
+            opacity: 0.8;
+        }
+
+        .empty-gallery h4 {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .empty-gallery p {
+            font-size: 13px;
+            color: var(--text-muted);
+            max-width: 360px;
+            line-height: 1.5;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: rgba(17, 24, 39, 0.85);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 12px;
+            padding: 14px 18px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #06b6d4, #8b5cf6);
+            border-radius: 999px;
+            transition: width 0.2s ease;
+        }
+
+        /* Output Toolbar */
+        .gallery-toolbar {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(17, 24, 39, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toolbar-buttons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-download-action {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 8px 16px;
+            border-radius: 9px;
+            font-size: 13px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-zip {
+            background: linear-gradient(135deg, #06b6d4, #0891b2);
+            color: #ffffff;
+            box-shadow: 0 2px 12px rgba(6, 182, 212, 0.3);
+        }
+
+        .btn-zip:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 18px rgba(6, 182, 212, 0.45);
+        }
+
+        .btn-pdf {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: #ffffff;
+            box-shadow: 0 2px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-pdf:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 18px rgba(139, 92, 246, 0.45);
+        }
+
+        /* Results Grid */
+        .results-grid {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 18px;
+        }
+
+        .result-card {
+            background: rgba(17, 24, 39, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.25s ease;
+        }
+
+        .result-card:hover {
+            border-color: rgba(6, 182, 212, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .result-img-box {
+            position: relative;
+            width: 100%;
+            background: #000;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+        }
+
+        .result-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .result-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.75);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(6, 182, 212, 0.4);
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 999px;
+            backdrop-filter: blur(8px);
+        }
+
+        .result-body {
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .result-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .result-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .btn-card-download {
+            margin-top: auto;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-card-download:hover {
+            background: rgba(6, 182, 212, 0.18);
+            border-color: var(--accent-cyan);
+            color: #67e8f9;
+        }
+
+        /* Off-Screen Native Staging Container */
+        #stage-container {
+            position: fixed;
+            left: -9999px;
+            top: -9999px;
+            width: auto;
+            height: auto;
+            z-index: -999;
+            opacity: 1;
+            pointer-events: none;
+        }
+
+        #inmain {
+            border: 2px solid #000;
+            position: relative;
+            background-color: #000;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        #mainimg {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: cover;
+        }
+
+        #im {
+            position: absolute;
+            bottom: 8px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 8px;
+            box-sizing: border-box;
+            z-index: 5;
+        }
+
+        #map {
+            height: 26px;
+            background-color: rgba(0, 0, 0, 0.70);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            padding: 2px 8px;
+            gap: 6px;
+            border-radius: 4px;
+            align-self: flex-end;
+            margin-right: 4px;
+            margin-bottom: 5px;
+        }
+
+        #kunal {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #kimg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+
+        #map :last-child {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        #content {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            align-items: stretch;
+            box-sizing: border-box;
+        }
+
+        #gimg {
+            height: 80px;
+            width: 80px;
+            min-width: 80px;
+            background-image: url("https://gibs.earthdata.nasa.gov/wmts/epsg4326/best/BlueMarble_ShadedRelief_Bathymetry/default//500m/2/1/2.jpeg");
+            background-position: center;
+            background-size: cover;
+            border-radius: 6px;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: flex-end;
+            padding: 5px;
+            box-sizing: border-box;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        #cont {
+            min-height: 80px;
+            flex: 1;
+            background-color: rgba(0, 0, 0, 0.70);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 6px 8px;
+            border-radius: 6px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        #cont .address {
+            font-size: 11px;
+            line-height: 14px;
+            margin-bottom: 3px;
+            word-break: break-word;
+        }
+
+        #cont .meta-info {
+            font-size: 10px;
+            line-height: 14px;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 900px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+
+            .panel {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            header {
+                padding: 16px 4px;
+                gap: 12px;
+            }
+
+            .brand-text h1 {
+                font-size: 19px;
+            }
+
+            .nav-tabs {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .nav-tab {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .row-2 {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .gallery-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .toolbar-buttons {
+                width: 100%;
+            }
+
+            .btn-download-action {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Header -->
+    <header>
+        <div class="brand">
+            <div class="brand-icon">🛰️</div>
+            <div class="brand-text">
+                <h1>GPS GENERATOR 2.0</h1>
+                <p>Professional Multi-Photo Geotag Studio</p>
+            </div>
+        </div>
+
+        <!-- Navigation Switcher -->
+        <nav class="nav-tabs">
+            <a href="index.html" class="nav-tab">
+                <span>📷</span>
+                <span>Single Photo</span>
+            </a>
+            <a href="batch.html" class="nav-tab active">
+                <span>⚡</span>
+                <span>Batch Mode</span>
+                <span class="tab-badge">Multi</span>
+            </a>
+        </nav>
+
+        <div class="badge-pro">
+            <div class="badge-dot"></div>
+            <span>Batch Engine</span>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="app-container">
+        <!-- Left Panel: Settings & Upload -->
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <span>⚡</span>
+                    <h3>Batch Photos & Settings</h3>
+                </div>
+                <div class="panel-badge">Step 1</div>
+            </div>
+
+            <div class="form-grid">
+                <!-- Multi-file Upload Dropzone -->
+                <div class="field-group">
+                    <label>
+                        <span>Select Photos (Multiple)</span>
+                        <span class="field-action" onclick="document.getElementById('batch-input').click()">Browse files</span>
+                    </label>
+                    <div class="upload-dropzone" id="dropzone" onclick="document.getElementById('batch-input').click()">
+                        <div class="dropzone-icon">📁</div>
+                        <div class="dropzone-text" id="dropzone-label">Click or Drag & Drop Multiple Photos / PDFs</div>
+                        <div class="dropzone-hint">Supports JPG, PNG, WebP, PDF • Select 1 to 50+ photos at once</div>
+                    </div>
+                    <input type="file" id="batch-input" multiple accept="image/*,application/pdf" style="display:none;">
+
+                    <!-- Uploaded Queue Container -->
+                    <div class="queue-wrapper" id="queue-wrapper">
+                        <div class="queue-header">
+                            <span>Selected Photos: <strong id="queue-count" class="queue-count">0</strong></span>
+                            <div style="display: flex; gap: 10px;">
+                                <button type="button" class="btn-text" onclick="document.getElementById('batch-input').click()">+ Add More</button>
+                                <button type="button" class="btn-text" onclick="clearAllPhotos()">🗑️ Clear All</button>
+                            </div>
+                        </div>
+                        <div class="queue-list" id="queue-list">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Date & Time Row -->
+                <div class="row-2">
+                    <div class="field-group">
+                        <label>
+                            <span>Base Time</span>
+                            <span class="field-action" onclick="setCurrentTime()">⚡ Now</span>
+                        </label>
+                        <div class="time-box">
+                            <input type="time" id="time">
+                            <select id="ampm">
+                                <option value="AM">AM</option>
+                                <option value="PM" selected>PM</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label><span>Base Date</span></label>
+                        <input type="date" id="date">
+                    </div>
+                </div>
+
+                <!-- Latitude & Longitude Row -->
+                <div class="row-2">
+                    <div class="field-group">
+                        <label>
+                            <span>Latitude</span>
+                            <span class="field-action" onclick="getCurrentLocation()">📍 GPS</span>
+                        </label>
+                        <input type="text" value="21.856876°" id="land" placeholder="e.g. 21.856876°">
+                    </div>
+
+                    <div class="field-group">
+                        <label><span>Longitude</span></label>
+                        <input type="text" value="75.1599166°" id="long" placeholder="e.g. 75.1599166°">
+                    </div>
+                </div>
+
+                <!-- Address Input -->
+                <div class="field-group">
+                    <label><span>Geotag Address</span></label>
+                    <textarea id="address" rows="3"
+                        placeholder="Enter complete location address">Khargone, Madhya Pradesh, India
+VH4X+MPW, Bardiya, Khaltaka, Khargone, Madhya Pradesh 451001, India</textarea>
+                </div>
+
+                <!-- Generate Batch Button -->
+                <button type="button" class="btn-generate" id="btn-generate" onclick="generateBatchPhotos()">
+                    <span>⚡</span>
+                    <span id="btn-generate-text">Generate GPS Photos (0)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Right Panel: Output Gallery -->
+        <div class="panel gallery-panel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <span>🖼️</span>
+                    <h3>Batch Output Gallery</h3>
+                </div>
+                <div class="panel-badge" id="output-badge">Ready</div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-container" id="progress-container">
+                <div class="progress-info">
+                    <span id="progress-status">Generating photo 1 of 5...</span>
+                    <span id="progress-percent">20%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progress-fill"></div>
+                </div>
+            </div>
+
+            <!-- Toolbar (ZIP / PDF) -->
+            <div class="gallery-toolbar" id="gallery-toolbar">
+                <div class="toolbar-title">
+                    <span>✅</span>
+                    <span id="toolbar-count">0 Photos Geotagged</span>
+                </div>
+                <div class="toolbar-buttons">
+                    <button class="btn-download-action btn-zip" onclick="downloadAllZip()">
+                        <span>📦</span> Download All (ZIP)
+                    </button>
+                    <button class="btn-download-action btn-pdf" onclick="downloadAllPdf()">
+                        <span>📄</span> Download All (PDF)
+                    </button>
+                    <button class="btn-text" style="color:var(--text-muted); padding:6px 10px;" onclick="clearResults()">
+                        Clear Gallery
+                    </button>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-gallery" id="empty-state">
+                <div class="empty-icon">🖼️</div>
+                <h4>No Photos Generated Yet</h4>
+                <p>Select multiple photos on the left, set your GPS coordinates and date/time, then click "Generate GPS Photos".</p>
+            </div>
+
+            <!-- Results Grid -->
+            <div class="results-grid" id="results-grid">
+                <!-- Dynamically populated cards -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden Native Staging Element for 1:1 html2canvas Overlay Generation -->
+    <div id="stage-container">
+        <div id="inmain">
+            <img id="mainimg" src="" alt="GPS Photo" crossorigin="anonymous">
+            <div id="im">
+                <div id="map">
+                    <div id="kunal">
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSh8F4PtVO0jvyMJX2cqZTVLM6GYP0jmtlT4Q&s"
+                            alt="" id="kimg" crossorigin="anonymous">
+                    </div>
+                    <div>GPS Map Camera</div>
+                </div>
+                <div id="content">
+                    <div id="gimg">google</div>
+                    <div id="cont">
+                        <div class="address" id="stage-address">Address</div>
+                        <div class="meta-info">
+                            Lat <span id="stage-lat">21.856876°</span> Long <span id="stage-long">75.1599166°</span><br>
+                            <span id="stage-date">06/12/24</span> <span id="stage-time">12:21 PM</span> GMT +05:30
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Libraries: html2canvas, JSZip, jsPDF, PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+    <script>
+        if (typeof pdfjsLib !== "undefined") {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
+        }
+
+        // Global State
+        let photoQueue = []; // { id, name, size, dataUrl, width, height, customLat, customLong, customDate, customTime, customAmPm }
+        let generatedOutputs = []; // { name, dataUrl, width, height, lat, long, date, time }
+
+        // DOM Elements
+        const dropzone = document.getElementById("dropzone");
+        const batchInput = document.getElementById("batch-input");
+        const queueWrapper = document.getElementById("queue-wrapper");
+        const queueList = document.getElementById("queue-list");
+        const queueCount = document.getElementById("queue-count");
+        const btnGenerate = document.getElementById("btn-generate");
+        const btnGenerateText = document.getElementById("btn-generate-text");
+
+        const timeInput = document.getElementById("time");
+        const ampmSelect = document.getElementById("ampm");
+        const dateInput = document.getElementById("date");
+        const landInput = document.getElementById("land");
+        const longInput = document.getElementById("long");
+        const addressTextarea = document.getElementById("address");
+
+        const progressContainer = document.getElementById("progress-container");
+        const progressFill = document.getElementById("progress-fill");
+        const progressPercent = document.getElementById("progress-percent");
+        const progressStatus = document.getElementById("progress-status");
+
+        const emptyState = document.getElementById("empty-state");
+        const galleryToolbar = document.getElementById("gallery-toolbar");
+        const toolbarCount = document.getElementById("toolbar-count");
+        const resultsGrid = document.getElementById("results-grid");
+        const outputBadge = document.getElementById("output-badge");
+
+        // Set Current Time and Date
+        function setCurrentTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            let ampm = hours >= 12 ? "PM" : "AM";
+            ampmSelect.value = ampm;
+            timeInput.value = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+            dateInput.value = now.toISOString().split("T")[0];
+        }
+        setCurrentTime();
+
+        timeInput.addEventListener("input", () => {
+            if (timeInput.value) {
+                let [h] = timeInput.value.split(":");
+                let hours = parseInt(h);
+                ampmSelect.value = hours >= 12 ? "PM" : "AM";
+            }
+        });
+
+        // GPS Geolocation
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        landInput.value = pos.coords.latitude.toFixed(6) + "°";
+                        longInput.value = pos.coords.longitude.toFixed(6) + "°";
+                    },
+                    (err) => {
+                        alert("Could not fetch location: " + err.message);
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        }
+
+        // Live update queue default previews when main GPS inputs change
+        [landInput, longInput, dateInput, timeInput, ampmSelect].forEach(el => {
+            el.addEventListener("change", () => {
+                if (photoQueue.length > 0 && !document.querySelector(".item-edit-box.active")) {
+                    renderQueue();
+                }
+            });
+        });
+
+        // Drag & Drop Handlers
+        dropzone.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            dropzone.classList.add("dragover");
+        });
+
+        dropzone.addEventListener("dragleave", () => {
+            dropzone.classList.remove("dragover");
+        });
+
+        dropzone.addEventListener("drop", (e) => {
+            e.preventDefault();
+            dropzone.classList.remove("dragover");
+            if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                handleFiles(e.dataTransfer.files);
+            }
+        });
+
+        batchInput.addEventListener("change", () => {
+            if (batchInput.files && batchInput.files.length > 0) {
+                handleFiles(batchInput.files);
+            }
+        });
+
+        // Handle File Batch
+        async function handleFiles(fileList) {
+            const files = Array.from(fileList);
+            if (files.length === 0) return;
+
+            document.getElementById("dropzone-label").innerText = "Reading photos...";
+
+            for (const file of files) {
+                const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
+                if (isPdf) {
+                    await processPdf(file);
+                } else {
+                    await processImage(file);
+                }
+            }
+
+            document.getElementById("dropzone-label").innerText = "Click or Drag & Drop Multiple Photos / PDFs";
+            renderQueue();
+        }
+
+        // Process Image File
+        function processImage(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const dataUrl = e.target.result;
+                    const temp = new Image();
+                    temp.onload = () => {
+                        photoQueue.push({
+                            id: 'img_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                            name: file.name,
+                            size: formatFileSize(file.size),
+                            dataUrl: dataUrl,
+                            width: temp.naturalWidth,
+                            height: temp.naturalHeight,
+                            customLat: null,
+                            customLong: null,
+                            customDate: null,
+                            customTime: null,
+                            customAmPm: null
+                        });
+                        resolve();
+                    };
+                    temp.onerror = () => resolve();
+                    temp.src = dataUrl;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Process PDF File (Extracts Pages)
+        function processPdf(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const typedarray = new Uint8Array(e.target.result);
+                        if (typeof pdfjsLib === "undefined") {
+                            resolve();
+                            return;
+                        }
+                        const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                            const page = await pdf.getPage(pageNum);
+                            const viewport = page.getViewport({ scale: 2.0 });
+                            const canvas = document.createElement("canvas");
+                            const ctx = canvas.getContext("2d");
+                            canvas.width = viewport.width;
+                            canvas.height = viewport.height;
+
+                            await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+                            const pageDataUrl = canvas.toDataURL("image/jpeg", 0.95);
+
+                            photoQueue.push({
+                                id: 'pdf_' + Date.now() + '_' + pageNum + '_' + Math.random().toString(36).substr(2, 5),
+                                name: `${file.name.replace(/\.pdf$/i, '')}_page${pageNum}.jpg`,
+                                size: formatFileSize(pageDataUrl.length * 0.75),
+                                dataUrl: pageDataUrl,
+                                width: canvas.width,
+                                height: canvas.height,
+                                customLat: null,
+                                customLong: null,
+                                customDate: null,
+                                customTime: null,
+                                customAmPm: null
+                            });
+                        }
+                    } catch (err) {
+                        console.error("PDF read error:", err);
+                    }
+                    resolve();
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // Render Queue List
+        function renderQueue() {
+            const count = photoQueue.length;
+            queueCount.innerText = count;
+            btnGenerateText.innerText = `Generate GPS Photos (${count})`;
+            btnGenerate.disabled = count === 0;
+
+            if (count === 0) {
+                queueWrapper.style.display = "none";
+                queueList.innerHTML = "";
+                return;
+            }
+
+            // Current global defaults from main inputs
+            const defaultLat = landInput.value || "21.856876°";
+            const defaultLong = longInput.value || "75.1599166°";
+            const defaultDate = dateInput.value || new Date().toISOString().split("T")[0];
+            const defaultTime = timeInput.value || "12:00";
+            const defaultAmPm = ampmSelect.value || "PM";
+
+            queueWrapper.style.display = "flex";
+            queueList.innerHTML = photoQueue.map((item, index) => {
+                const hasCustom = item.customLat !== null || item.customLong !== null || item.customTime !== null || item.customDate !== null;
+
+                // Pre-filled values: Use custom if saved by user, otherwise pre-fill with current default
+                const currentPhotoLat = item.customLat !== null && item.customLat !== undefined ? item.customLat : defaultLat;
+                const currentPhotoLong = item.customLong !== null && item.customLong !== undefined ? item.customLong : defaultLong;
+                const currentPhotoDate = item.customDate !== null && item.customDate !== undefined ? item.customDate : defaultDate;
+                const currentPhotoTime = item.customTime !== null && item.customTime !== undefined ? item.customTime : defaultTime;
+                const currentPhotoAmPm = item.customAmPm !== null && item.customAmPm !== undefined ? item.customAmPm : defaultAmPm;
+
+                return `
+                <div class="queue-item" id="q-card-${item.id}">
+                    <img class="queue-thumb" src="${item.dataUrl}" alt="thumb">
+                    <div class="queue-info">
+                        <div class="queue-name" title="${item.name}">${index + 1}. ${item.name}</div>
+                        <div class="queue-meta">
+                            <span>${item.width}×${item.height}px</span>
+                            <span>${item.size}</span>
+                            ${hasCustom ? '<span style="color:var(--accent-cyan); font-weight:700;">• Custom GPS</span>' : '<span style="color:var(--text-dim);">• Default GPS</span>'}
+                        </div>
+                    </div>
+                    <div class="queue-actions">
+                        <button type="button" class="btn-edit-item" onclick="toggleItemEdit('${item.id}')" title="Edit individual GPS/Time">✏️ Edit</button>
+                        <button type="button" class="btn-icon-small" onclick="removePhoto('${item.id}')" title="Remove photo">✕</button>
+                    </div>
+                </div>
+                <div class="item-edit-box" id="edit-box-${item.id}">
+                    <div class="item-edit-header">
+                        <span>✏️ Custom GPS & Timestamp</span>
+                        <span class="item-edit-tip">Default values pre-filled below:</span>
+                    </div>
+                    <div class="item-edit-grid">
+                        <div class="edit-field">
+                            <label>Latitude</label>
+                            <input type="text" id="edit-lat-${item.id}" placeholder="Latitude (e.g. 21.856876°)" value="${currentPhotoLat}">
+                        </div>
+                        <div class="edit-field">
+                            <label>Longitude</label>
+                            <input type="text" id="edit-long-${item.id}" placeholder="Longitude (e.g. 75.1599166°)" value="${currentPhotoLong}">
+                        </div>
+                        <div class="edit-field">
+                            <label>Date</label>
+                            <input type="date" id="edit-date-${item.id}" value="${currentPhotoDate}">
+                        </div>
+                        <div class="edit-field">
+                            <label>Time</label>
+                            <div style="display:flex; gap:4px;">
+                                <input type="time" id="edit-time-${item.id}" value="${currentPhotoTime}">
+                                <select id="edit-ampm-${item.id}" style="width:68px; flex-shrink:0;">
+                                    <option value="AM" ${currentPhotoAmPm === 'AM' ? 'selected' : ''}>AM</option>
+                                    <option value="PM" ${currentPhotoAmPm === 'PM' ? 'selected' : ''}>PM</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-edit-actions">
+                        <button type="button" class="btn-text" onclick="resetItemCustom('${item.id}')">↺ Reset to Default</button>
+                        <button type="button" class="btn-edit-item" style="padding:5px 14px;" onclick="saveItemCustom('${item.id}')">✓ Save Changes</button>
+                    </div>
+                </div>
+                `;
+            }).join("");
+        }
+
+        // Toggle Item Edit Box
+        function toggleItemEdit(id) {
+            const box = document.getElementById("edit-box-" + id);
+            if (box) {
+                box.classList.toggle("active");
+            }
+        }
+
+        function saveItemCustom(id) {
+            const item = photoQueue.find(p => p.id === id);
+            if (!item) return;
+            const latVal = document.getElementById("edit-lat-" + id).value.trim();
+            const longVal = document.getElementById("edit-long-" + id).value.trim();
+            const dateVal = document.getElementById("edit-date-" + id).value;
+            const timeVal = document.getElementById("edit-time-" + id).value;
+            const ampmVal = document.getElementById("edit-ampm-" + id).value;
+
+            item.customLat = latVal || null;
+            item.customLong = longVal || null;
+            item.customDate = dateVal || null;
+            item.customTime = timeVal || null;
+            item.customAmPm = ampmVal || null;
+
+            toggleItemEdit(id);
+            renderQueue();
+        }
+
+        function resetItemCustom(id) {
+            const item = photoQueue.find(p => p.id === id);
+            if (!item) return;
+            item.customLat = null;
+            item.customLong = null;
+            item.customDate = null;
+            item.customTime = null;
+            item.customAmPm = null;
+            toggleItemEdit(id);
+            renderQueue();
+        }
+
+        function removePhoto(id) {
+            photoQueue = photoQueue.filter(p => p.id !== id);
+            renderQueue();
+        }
+
+        function clearAllPhotos() {
+            if (confirm("Are you sure you want to clear all uploaded photos?")) {
+                photoQueue = [];
+                batchInput.value = "";
+                renderQueue();
+            }
+        }
+
+        // Generate All GPS Photos
+        async function generateBatchPhotos() {
+            if (photoQueue.length === 0) {
+                alert("Please add at least one photo first.");
+                return;
+            }
+
+            btnGenerate.disabled = true;
+            progressContainer.style.display = "flex";
+            emptyState.style.display = "none";
+            galleryToolbar.style.display = "none";
+            resultsGrid.style.display = "grid";
+            resultsGrid.innerHTML = "";
+            generatedOutputs = [];
+
+            const total = photoQueue.length;
+            const globalTime = timeInput.value;
+            const globalAmPm = ampmSelect.value;
+            const globalDate = dateInput.value;
+            const globalLat = landInput.value || "21.856876°";
+            const globalLong = longInput.value || "75.1599166°";
+            const globalAddress = addressTextarea.value || "Khargone, Madhya Pradesh, India";
+
+            // Stage elements
+            const inmain = document.getElementById("inmain");
+            const stageImg = document.getElementById("mainimg");
+            const stageAddress = document.getElementById("stage-address");
+            const stageLat = document.getElementById("stage-lat");
+            const stageLong = document.getElementById("stage-long");
+            const stageDate = document.getElementById("stage-date");
+            const stageTime = document.getElementById("stage-time");
+
+            stageAddress.innerHTML = globalAddress.replace(/\n/g, "<br>");
+
+            for (let i = 0; i < total; i++) {
+                const item = photoQueue[i];
+                const pct = Math.round(((i + 1) / total) * 100);
+                progressFill.style.width = pct + "%";
+                progressPercent.innerText = pct + "%";
+                progressStatus.innerText = `Geotagging photo ${i + 1} of ${total}: ${item.name}`;
+
+                // Resolve Lat/Long/Time/Date
+                const finalLat = item.customLat || globalLat;
+                const finalLong = item.customLong || globalLong;
+                const finalDateRaw = item.customDate || globalDate;
+                const finalDate = formatDate(finalDateRaw);
+
+                let finalTime = "";
+                if (item.customTime) {
+                    finalTime = formatTime(item.customTime, item.customAmPm || globalAmPm);
+                } else {
+                    finalTime = formatTime(globalTime, globalAmPm);
+                }
+
+                stageLat.innerText = finalLat;
+                stageLong.innerText = finalLong;
+                stageDate.innerText = finalDate;
+                stageTime.innerText = finalTime;
+
+                // Load image into staging
+                await new Promise((res) => {
+                    stageImg.onload = () => res();
+                    stageImg.onerror = () => res();
+                    stageImg.src = item.dataUrl;
+                    if (stageImg.complete && stageImg.naturalWidth) res();
+                });
+
+                // Set Stage Size to exact aspect ratio
+                const origW = item.width;
+                const origH = item.height;
+                const dispW = 600;
+                const dispH = Math.round(origH * (dispW / origW));
+
+                inmain.style.width = dispW + "px";
+                inmain.style.height = dispH + "px";
+
+                // Render with html2canvas at exact scale
+                const scale = origW / dispW;
+                const canvas = await html2canvas(inmain, {
+                    useCORS: true,
+                    scale: scale,
+                    width: dispW,
+                    height: dispH,
+                    scrollX: 0,
+                    scrollY: 0,
+                    backgroundColor: "#ffffff"
+                });
+
+                const outDataUrl = canvas.toDataURL("image/jpeg", 0.95);
+                const resultObj = {
+                    name: `geotag_${item.name.replace(/\.[^/.]+$/, "")}.jpg`,
+                    dataUrl: outDataUrl,
+                    width: origW,
+                    height: origH,
+                    lat: finalLat,
+                    long: finalLong,
+                    date: finalDate,
+                    time: finalTime
+                };
+                generatedOutputs.push(resultObj);
+
+                // Add to visual results grid
+                appendResultCard(resultObj, i);
+            }
+
+            // Finish
+            progressContainer.style.display = "none";
+            galleryToolbar.style.display = "flex";
+            toolbarCount.innerText = `${generatedOutputs.length} Photos Geotagged`;
+            outputBadge.innerText = `${generatedOutputs.length} Output Ready`;
+            btnGenerate.disabled = false;
+        }
+
+        // Append Card to Result Grid
+        function appendResultCard(item, index) {
+            const card = document.createElement("div");
+            card.className = "result-card";
+            card.innerHTML = `
+                <div class="result-img-box">
+                    <img class="result-img" src="${item.dataUrl}" alt="geotagged">
+                    <div class="result-badge">${item.width}×${item.height}</div>
+                </div>
+                <div class="result-body">
+                    <div class="result-title">${item.name}</div>
+                    <div class="result-meta">
+                        📍 ${item.lat}, ${item.long}<br>
+                        🕒 ${item.date} • ${item.time}
+                    </div>
+                    <button type="button" class="btn-card-download" onclick="downloadSingleResult(${index})">
+                        <span>📥</span> Download JPG
+                    </button>
+                </div>
+            `;
+            resultsGrid.appendChild(card);
+        }
+
+        // Download Single Result JPG
+        function downloadSingleResult(index) {
+            const item = generatedOutputs[index];
+            if (!item) return;
+            const a = document.createElement("a");
+            a.href = item.dataUrl;
+            a.download = item.name;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // 1-Click ZIP Download for All Photos
+        async function downloadAllZip() {
+            if (generatedOutputs.length === 0) return;
+            if (typeof JSZip === "undefined") {
+                alert("JSZip library is still loading. Please try again.");
+                return;
+            }
+
+            const zip = new JSZip();
+            const folder = zip.folder("geotagged_photos");
+
+            generatedOutputs.forEach((item) => {
+                const base64Data = item.dataUrl.split(",")[1];
+                folder.file(item.name, base64Data, { base64: true });
+            });
+
+            const content = await zip.generateAsync({ type: "blob" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(content);
+            link.download = `GPS_Geotag_Batch_${Date.now()}.zip`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 1-Click Multi-Page PDF Download
+        async function downloadAllPdf() {
+            if (generatedOutputs.length === 0) return;
+            if (typeof window.jspdf === "undefined" || !window.jspdf.jsPDF) {
+                alert("PDF library is still loading. Please try again.");
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const first = generatedOutputs[0];
+            const firstOrientation = first.width >= first.height ? 'landscape' : 'portrait';
+
+            const pdf = new jsPDF({
+                orientation: firstOrientation,
+                unit: 'px',
+                format: [first.width, first.height]
+            });
+
+            for (let i = 0; i < generatedOutputs.length; i++) {
+                const item = generatedOutputs[i];
+                if (i > 0) {
+                    const orientation = item.width >= item.height ? 'landscape' : 'portrait';
+                    pdf.addPage([item.width, item.height], orientation);
+                }
+                pdf.addImage(item.dataUrl, 'JPEG', 0, 0, item.width, item.height);
+            }
+
+            pdf.save(`GPS_Geotag_Album_${Date.now()}.pdf`);
+        }
+
+        // Clear Results Gallery
+        function clearResults() {
+            generatedOutputs = [];
+            resultsGrid.innerHTML = "";
+            resultsGrid.style.display = "none";
+            galleryToolbar.style.display = "none";
+            emptyState.style.display = "flex";
+            outputBadge.innerText = "Ready";
+        }
+
+        // Helpers
+        function formatDate(dStr) {
+            if (!dStr) return "06/12/24";
+            const parts = dStr.split("-");
+            if (parts.length === 3) {
+                return `${parts[2]}/${parts[1]}/${parts[0].slice(-2)}`;
+            }
+            return dStr;
+        }
+
+        function formatTime(tStr, ampm) {
+            if (!tStr) return "12:00 PM";
+            let [h, m] = tStr.split(":");
+            let hours = parseInt(h);
+            hours = hours % 12 || 12;
+            return `${hours}:${m} ${ampm}`;
+        }
+
+        function formatFileSize(bytes) {
+            if (!bytes) return "0 B";
+            const k = 1024;
+            const sizes = ["B", "KB", "MB", "GB"];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
+        }
+    </script>
+</body>
+
+</html>
